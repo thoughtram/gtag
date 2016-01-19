@@ -1,0 +1,8 @@
+[package]
+name = "gtag"
+version = "0.1.0"
+authors = ["Christoph Burgdorf <christoph.burgdorf@gmail.com>"]
+
+[dependencies]
+
+clap = "~1.5"
