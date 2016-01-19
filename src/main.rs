@@ -37,7 +37,7 @@ fn main() {
     tag_commits(get_commits(from, to), pattern, dry_run);
 }
 
-fn get_commits (from: &str, to: &str) -> Vec<String> {
+fn get_commits (from: &str, to: &str) -> Box<Iterator<Item=String>> {
     let output = Command::new("git")
                .arg("log")
                .arg(from)
@@ -51,15 +51,14 @@ fn get_commits (from: &str, to: &str) -> Vec<String> {
     }
 
     let res = String::from_utf8_lossy(&output.stdout);
-    let res: Vec<String> = res.split('\n')
+    let res = res.split('\n')
                               .map(|msg| msg.split(' ').nth(0).unwrap().to_string())
-                              .filter(|sha| sha.len() > 0)
-                              .collect();
-    res
+                              .filter(|sha| sha.len() > 0);
+    Box::new(res)
 }
 
-fn tag_commits (commits: Vec<String>, pattern: &str, dry_run: bool) {
-    for (idx, commit) in commits.iter().enumerate() {
+fn tag_commits (commits: Box<Iterator<Item=String>>, pattern: &str, dry_run: bool) {
+    for (idx, commit) in commits.enumerate() {
         let tag_name = pattern
                         .replace("##ii", &format!("{}",idx + 1))
                         .replace("##i", &format!("{}",idx));
@@ -69,7 +68,7 @@ fn tag_commits (commits: Vec<String>, pattern: &str, dry_run: bool) {
         }
         else {
             println!("tagging commit {} as {}", commit, tag_name);
-            tag_commit(commit, &tag_name);
+            tag_commit(&commit, &tag_name);
         }
     }
 }
