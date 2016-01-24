@@ -2,6 +2,13 @@
 name = "gtag"
 version = "0.1.0"
 authors = ["Christoph Burgdorf <christoph.burgdorf@gmail.com>"]
+description = "The missing range tag command for Git"
+repository = "https://github.com/thoughtram/gtag"
+documentation = "https://github.com/thoughtram/gtag"
+readme = "README.md"
+license = "MIT"
+keywords = ["argument", "command", "git", "tag"]
+
 
 [dependencies]
 
