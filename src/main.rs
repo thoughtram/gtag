@@ -35,6 +35,7 @@ fn get_commits (range: &str) -> Vec<String> {
     let output = Command::new("git")
                .arg("log")
                .arg(range)
+               .arg("--reverse")
                .arg("--boundary")
                .arg("--pretty=oneline")
                .arg("--abbrev-commit")
