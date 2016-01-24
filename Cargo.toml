@@ -1,6 +1,6 @@
 [package]
 name = "gtag"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Christoph Burgdorf <christoph.burgdorf@gmail.com>"]
 description = "The missing range tag command for Git"
 repository = "https://github.com/thoughtram/gtag"
