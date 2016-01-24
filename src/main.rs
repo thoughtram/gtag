@@ -8,40 +8,34 @@ fn main() {
                              .version("0.1.0")
                              .author("Christoph Burgdorf <christoph@thoughtram.io>")
                              .about("The missing range tag command for Git")
-                             .arg(Arg::with_name("from")
-                                  .long("from")
-                                  .help("Sets the starting point")
-                                  .required(true)
-                                  .takes_value(true))
-                             .arg(Arg::with_name("to")
-                                  .long("to")
-                                  .help("Sets the ending point")
-                                  .required(true)
-                                  .takes_value(true))
-                              .arg(Arg::with_name("pattern")
-                                   .long("pattern")
-                                   .help("Sets the pattern for the tag name")
-                                   .required(true)
-                                   .takes_value(true))
-                              .arg(Arg::with_name("dryrun")
-                                   .long("dryrun")
-                                   .short("d")
-                                   .help("Just prints but doesn't tag"))
+                             .arg(Arg::with_name("range")
+                                 .help("Sets the commit range")
+                                 .required(true)
+                                 .index(1))
+                             .arg(Arg::with_name("pattern")
+                                 .long("pattern")
+                                 .help("Sets the pattern for the tag name")
+                                 .required(true)
+                                 .takes_value(true))
+                             .arg(Arg::with_name("dryrun")
+                                 .long("dryrun")
+                                 .short("d")
+                                 .help("Just prints but doesn't tag"))
                              .get_matches();
 
-    let from    = matches.value_of("from").unwrap();
-    let to      = matches.value_of("to").unwrap();
+    let range   = matches.value_of("range").unwrap();
     let pattern = matches.value_of("pattern").unwrap();
     let dry_run = matches.is_present("dryrun");
 
-    tag_commits(get_commits(from, to), pattern, dry_run);
+    println!("{}", range);
+    tag_commits(get_commits(range), pattern, dry_run);
 }
 
-fn get_commits (from: &str, to: &str) -> Vec<String> {
+fn get_commits (range: &str) -> Vec<String> {
     let output = Command::new("git")
                .arg("log")
-               .arg(from)
-               .arg(to)
+               .arg(range)
+               .arg("--boundary")
                .arg("--pretty=oneline")
                .arg("--abbrev-commit")
                .output().unwrap_or_else(|e| panic!("Failed to run 'git log' with error: {}", e));
@@ -52,7 +46,8 @@ fn get_commits (from: &str, to: &str) -> Vec<String> {
 
     let res = String::from_utf8_lossy(&output.stdout);
     let res: Vec<String> = res.split('\n')
-                              .map(|msg| msg.split(' ').nth(0).unwrap().to_string())
+                              //--boundary places a `- ` infront of the commit hash, hence the replace
+                              .map(|msg| msg.replace("- ", "").split(' ').nth(0).unwrap().to_string())
                               .filter(|sha| sha.len() > 0)
                               .collect();
     res
