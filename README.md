@@ -6,21 +6,30 @@ The missing git command to rapidly create tags from commit ranges.
 
 ```
 USAGE:
-	gtag [FLAGS] --from <from> --to <to> --pattern <pattern>
+	gtag [FLAGS] <range> <pattern>
 
 FLAGS:
     -d, --dryrun     Just prints but doesn't tag
     -h, --help       Prints help information
     -V, --version    Prints version information
 
-OPTIONS:
-        --from <from>          Sets the starting point
-        --to <to>              Sets the ending point
-        --pattern <pattern>    Sets the pattern for the tag name
+ARGS:
+    range      Sets the commit range
+    pattern    Sets the pattern for the tag name
 ```
+
+## Specifying a range
+
+Ranges can be specified following the standard Git range syntax (e.g. `sha1..sha2`).
+There's one catch though: Git treats the first commit as exclusive whereas `gtag`
+always treats them as inclusive. This deliberate choice made for convenience.
 
 ## Pattern syntax
 
 The pattern is a simple string that can take `##i` as a replacement markers that
 will automatically be replaced by the index of the commit in the range. Alternatively
-`##ii` uses the index + 1. 
+`##ii` uses the index + 1.
+
+## Installation
+
+The easiest way to get the `gtag` command is through cargo. Just run `cargo install gtag`.
