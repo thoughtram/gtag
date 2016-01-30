@@ -9,7 +9,8 @@ USAGE:
 	gtag [FLAGS] <range> <pattern>
 
 FLAGS:
-    -d, --dryrun     Just prints but doesn't tag
+    -d, --delete     Deletes generated tags
+        --dryrun     Just prints what it would do
     -h, --help       Prints help information
     -V, --version    Prints version information
 

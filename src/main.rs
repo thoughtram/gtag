@@ -18,7 +18,7 @@ fn main() {
                                  .required(true))
                              .arg(Arg::with_name("dryrun")
                                  .long("dryrun")
-                                 .help("Just prints but doesn't tag"))
+                                 .help("Just prints what it would do"))
                              .arg(Arg::with_name("delete")
                                  .long("delete")
                                  .short("d")
