@@ -25,6 +25,10 @@ Ranges can be specified following the standard Git range syntax (e.g. `sha1..sha
 There's one catch though: Git treats the first commit as exclusive whereas `gtag`
 always treats them as inclusive. This deliberate choice made for convenience.
 
+Another choice made for convenience is that one can use the special marker `root` to
+address the first commit so that `root..` is a totally valid option to address the entire
+history.
+
 ## Pattern syntax
 
 The pattern is a simple string that can take `##i` as a replacement markers that
