@@ -18,16 +18,24 @@ fn main() {
                                  .required(true))
                              .arg(Arg::with_name("dryrun")
                                  .long("dryrun")
-                                 .short("d")
                                  .help("Just prints but doesn't tag"))
+                             .arg(Arg::with_name("delete")
+                                 .long("delete")
+                                 .short("d")
+                                 .help("Deletes generated tags"))
                              .get_matches();
 
     let range   = matches.value_of("range").unwrap();
     let pattern = matches.value_of("pattern").unwrap();
     let dry_run = matches.is_present("dryrun");
+    let delete = matches.is_present("delete");
 
     println!("{}", range);
-    tag_commits(get_commits(range), pattern, dry_run);
+
+    match delete {
+        false => tag_commits(get_commits(range), pattern, dry_run),
+        true => untag_commits(get_commits(range), pattern, dry_run)
+    }
 }
 
 fn get_commits (range: &str) -> Vec<String> {
@@ -55,9 +63,7 @@ fn get_commits (range: &str) -> Vec<String> {
 
 fn tag_commits (commits: Vec<String>, pattern: &str, dry_run: bool) {
     for (idx, commit) in commits.iter().enumerate() {
-        let tag_name = pattern
-                        .replace("##ii", &format!("{}",idx + 1))
-                        .replace("##i", &format!("{}",idx));
+        let tag_name = gen_tag_name(pattern, idx);
 
         if dry_run {
             println!("not tagging commit {} as {} (dry-run)", commit, tag_name);
@@ -76,6 +82,39 @@ fn tag_commit (commit: &str, tag_name: &str) {
                .arg(tag_name)
                .arg(commit)
                .output().unwrap_or_else(|e| panic!("Failed to run 'git tag' with error: {}", e));
+
+    if !output.status.success() {
+        panic!("{}", String::from_utf8_lossy(&output.stderr));
+    }
+}
+
+fn untag_commits (commits: Vec<String>, pattern: &str, dry_run: bool) {
+    for (idx, commit) in commits.iter().enumerate() {
+        let tag_name = gen_tag_name(pattern, idx);
+
+        if dry_run {
+            println!("not untagging commit {} as {} (dry-run)", commit, tag_name);
+        }
+        else {
+            println!("removing tag {} from commit {}", tag_name, commit);
+            delete_tag(&tag_name);
+        }
+    }
+}
+
+fn gen_tag_name(pattern: &str, idx: usize) -> String {
+    let tag_name = pattern
+                    .replace("##ii", &format!("{}",idx + 1))
+                    .replace("##i", &format!("{}",idx));
+    tag_name
+}
+
+fn delete_tag (tag_name: &str) {
+    let output = Command::new("git")
+               .arg("tag")
+               .arg("-d")
+               .arg(tag_name)
+               .output().unwrap_or_else(|e| panic!("Failed to run 'git tag -d' with error: {}", e));
 
     if !output.status.success() {
         panic!("{}", String::from_utf8_lossy(&output.stderr));
