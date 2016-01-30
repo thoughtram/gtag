@@ -5,7 +5,7 @@ use std::process::Command;
 
 fn main() {
     let matches = App::new("gtag")
-                             .version("0.2.1")
+                             .version("0.3.0")
                              .author("Christoph Burgdorf <christoph@thoughtram.io>")
                              .about("The missing range tag command for Git")
                              .arg(Arg::with_name("range")
