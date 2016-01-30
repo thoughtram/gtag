@@ -25,7 +25,7 @@ fn main() {
                                  .help("Deletes generated tags"))
                              .get_matches();
 
-    let range   = matches.value_of("range").unwrap();
+    let range   = &matches.value_of("range").unwrap().replace("root", &get_first_commit_sha());
     let pattern = matches.value_of("pattern").unwrap();
     let dry_run = matches.is_present("dryrun");
     let delete = matches.is_present("delete");
@@ -119,4 +119,18 @@ fn delete_tag (tag_name: &str) {
     if !output.status.success() {
         panic!("{}", String::from_utf8_lossy(&output.stderr));
     }
+}
+
+fn get_first_commit_sha () -> String {
+    let output = Command::new("git")
+               .arg("rev-list")
+               .arg("--max-parents=0")
+               .arg("HEAD")
+               .output().unwrap_or_else(|e| panic!("Failed to run 'git rev-list --max-parents=0 HEAD' with error: {}", e));
+
+    if !output.status.success() {
+        panic!("{}", String::from_utf8_lossy(&output.stderr));
+    }
+
+    String::from_utf8_lossy(&output.stdout).into_owned().trim().to_owned()
 }
